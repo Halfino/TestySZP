@@ -1,0 +1,13 @@
+﻿<Window x:Class="TestySZP.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Testy SZP" Height="400" Width="400">
+
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button Content="Správa osob" Command="{Binding OpenPersonManagementCommand}" Width="200" Height="50" Margin="0,5"/>
+            <Button Content="Správa otázek" Command="{Binding OpenQuestionManagementCommand}" Width="200" Height="50" Margin="0,5"/>
+            <Button Content="Generovat testy" Command="{Binding OpenTestGenerationCommand}" Width="200" Height="50" Margin="0,5"/>
+        </StackPanel>
+    </Grid>
+</Window>
