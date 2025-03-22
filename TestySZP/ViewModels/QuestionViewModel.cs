@@ -33,10 +33,30 @@ namespace TestySZP.ViewModels
             get => _selectedQuestion;
             set
             {
+                if (_selectedQuestion != null)
+                {
+                    // Odpojení eventu ze staré otázky
+                    _selectedQuestion.PropertyChanged -= SelectedQuestion_PropertyChanged;
+                }
+
                 _selectedQuestion = value;
                 OnPropertyChanged(nameof(SelectedQuestion));
                 OnPropertyChanged(nameof(IsQuestionSelected));
                 OnPropertyChanged(nameof(IsWritten));
+
+                if (_selectedQuestion != null)
+                {
+                    // Připojení k nové
+                    _selectedQuestion.PropertyChanged += SelectedQuestion_PropertyChanged;
+                }
+            }
+        }
+
+        private void SelectedQuestion_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (SelectedQuestion != null)
+            {
+                QuestionRepository.UpdateQuestion(SelectedQuestion);
             }
         }
 
@@ -61,7 +81,6 @@ namespace TestySZP.ViewModels
         }
 
         public ICommand AddQuestionCommand { get; }
-        public ICommand UpdateQuestionCommand { get; }
         public ICommand DeleteQuestionCommand { get; }
 
         public QuestionViewModel()
@@ -70,7 +89,6 @@ namespace TestySZP.ViewModels
             KnowledgeLevels = new ObservableCollection<int> { 1, 2, 3 };
 
             AddQuestionCommand = new RelayCommand(param => AddQuestion());
-            UpdateQuestionCommand = new RelayCommand(param => UpdateQuestion(), param => SelectedQuestion != null);
             DeleteQuestionCommand = new RelayCommand(param => DeleteQuestion(), param => SelectedQuestion != null);
 
             ResetNewQuestion();
@@ -82,26 +100,6 @@ namespace TestySZP.ViewModels
             Questions.Add(NewQuestion);
             ResetNewQuestion();
         }
-
-        private void UpdateQuestion()
-        {
-            if (SelectedQuestion == null)
-                return;
-
-            int idToRestore = SelectedQuestion.Id;
-
-            QuestionRepository.UpdateQuestion(SelectedQuestion);
-
-            // Refresh kolekce
-            var allQuestions = QuestionRepository.GetAllQuestions();
-            Questions.Clear();
-            foreach (var q in allQuestions)
-                Questions.Add(q);
-
-            // Teď bezpečně obnovíme výběr
-            SelectedQuestion = Questions.FirstOrDefault(q => q.Id == idToRestore);
-        }
-
 
         private void DeleteQuestion()
         {
