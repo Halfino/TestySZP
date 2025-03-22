@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Input;
 using TestySZP.Data.Repositories;
 using TestySZP.Models;
@@ -14,6 +15,18 @@ namespace TestySZP.ViewModels
         public ObservableCollection<Question> Questions { get; set; }
         public ObservableCollection<int> KnowledgeLevels { get; set; }
 
+        private Question _newQuestion;
+        public Question NewQuestion
+        {
+            get => _newQuestion;
+            set
+            {
+                _newQuestion = value;
+                OnPropertyChanged(nameof(NewQuestion));
+                OnPropertyChanged(nameof(IsWritten));
+            }
+        }
+
         private Question _selectedQuestion;
         public Question SelectedQuestion
         {
@@ -21,109 +34,79 @@ namespace TestySZP.ViewModels
             set
             {
                 _selectedQuestion = value;
-                EnsureAnswersInitialized(_selectedQuestion);
                 OnPropertyChanged(nameof(SelectedQuestion));
-                OnPropertyChanged(nameof(IsMultipleChoice));
-                OnPropertyChanged(nameof(CanAddAnswer));
+                OnPropertyChanged(nameof(IsQuestionSelected));
+                OnPropertyChanged(nameof(IsWritten));
             }
         }
 
-        private Answer _selectedAnswer;
-        public Answer SelectedAnswer
+        public bool IsQuestionSelected => SelectedQuestion != null;
+
+        public bool IsWritten
         {
-            get => _selectedAnswer;
-            set
+            get
             {
-                _selectedAnswer = value;
-                OnPropertyChanged(nameof(SelectedAnswer));
+                if (SelectedQuestion != null) return SelectedQuestion.Type == QuestionType.Written;
+                return NewQuestion?.Type == QuestionType.Written;
             }
-        }
-
-
-        public bool IsMultipleChoice
-        {
-            get => SelectedQuestion?.Type == QuestionType.MultipleChoice;
             set
             {
                 if (SelectedQuestion != null)
-                {
-                    SelectedQuestion.Type = value ? QuestionType.MultipleChoice : QuestionType.Written;
-                    if (value && SelectedQuestion.Answers == null)
-                    {
-                        SelectedQuestion.Answers = new ObservableCollection<Answer>(); // ✅ Při přepnutí na Multiple Choice zajistíme inicializaci
-                    }
-                    else if (!value)
-                    {
-                        SelectedQuestion.Answers?.Clear(); // ✅ Při přepnutí na Written smažeme odpovědi
-                    }
-                    OnPropertyChanged(nameof(IsMultipleChoice));
-                    OnPropertyChanged(nameof(SelectedQuestion));
-                }
+                    SelectedQuestion.Type = value ? QuestionType.Written : QuestionType.MultipleChoice;
+                else if (NewQuestion != null)
+                    NewQuestion.Type = value ? QuestionType.Written : QuestionType.MultipleChoice;
+
+                OnPropertyChanged(nameof(IsWritten));
             }
         }
-
-        public bool CanAddAnswer => SelectedQuestion != null && IsMultipleChoice;
 
         public ICommand AddQuestionCommand { get; }
         public ICommand UpdateQuestionCommand { get; }
         public ICommand DeleteQuestionCommand { get; }
-        public ICommand AddAnswerCommand { get; }
-        public ICommand DeleteAnswerCommand { get; }
 
         public QuestionViewModel()
         {
             Questions = new ObservableCollection<Question>(QuestionRepository.GetAllQuestions());
             KnowledgeLevels = new ObservableCollection<int> { 1, 2, 3 };
 
-            if (Questions.Count > 0)
-            {
-                SelectedQuestion = Questions[0];
-                EnsureAnswersInitialized(SelectedQuestion);
-            }
-            else
-            {
-                AddQuestion(); // ✅ Pokud nejsou otázky, automaticky vytvoříme novou
-            }
-
             AddQuestionCommand = new RelayCommand(param => AddQuestion());
             UpdateQuestionCommand = new RelayCommand(param => UpdateQuestion(), param => SelectedQuestion != null);
             DeleteQuestionCommand = new RelayCommand(param => DeleteQuestion(), param => SelectedQuestion != null);
-            AddAnswerCommand = new RelayCommand(param => AddAnswer(), param => CanAddAnswer);
-            DeleteAnswerCommand = new RelayCommand(param => DeleteAnswer(), param => SelectedQuestion != null && SelectedQuestion.Answers.Count > 0);
-        }
 
-        private void EnsureAnswersInitialized(Question question)
-        {
-            if (question != null && question.Answers == null)
-            {
-                question.Answers = new ObservableCollection<Answer>(); // ✅ Oprava inicializace odpovědí
-            }
+            ResetNewQuestion();
         }
 
         private void AddQuestion()
         {
-            var newQuestion = new Question
-            {
-                Text = "Nová otázka",
-                Type = QuestionType.MultipleChoice,
-                KnowledgeClass = 3,
-                Answers = new ObservableCollection<Answer>()
-            };
-
-            QuestionRepository.AddQuestion(newQuestion);
-            Questions.Add(newQuestion);
-            SelectedQuestion = newQuestion;
-            OnPropertyChanged(nameof(SelectedQuestion));
+            QuestionRepository.AddQuestion(NewQuestion);
+            Questions.Add(NewQuestion);
+            ResetNewQuestion();
         }
 
         private void UpdateQuestion()
         {
-            if (SelectedQuestion != null)
+            if (SelectedQuestion == null)
+                return;
+
+            // Uložíme změnu do DB
+            QuestionRepository.UpdateQuestion(SelectedQuestion);
+
+            // Najdeme otázku v kolekci a ručně přepíšeme její hodnoty
+            var updatedFromDb = QuestionRepository.GetById(SelectedQuestion.Id);
+            var questionInList = Questions.FirstOrDefault(q => q.Id == SelectedQuestion.Id);
+
+            if (questionInList != null && updatedFromDb != null)
             {
-                QuestionRepository.UpdateQuestion(SelectedQuestion);
+                questionInList.Text = updatedFromDb.Text;
+                questionInList.Type = updatedFromDb.Type;
+                questionInList.KnowledgeClass = updatedFromDb.KnowledgeClass;
+
+                // Oznámíme změnu UI
                 OnPropertyChanged(nameof(Questions));
+                SelectedQuestion = questionInList;
             }
         }
+
 
         private void DeleteQuestion()
         {
@@ -132,38 +115,22 @@ namespace TestySZP.ViewModels
                 QuestionRepository.DeleteQuestion(SelectedQuestion.Id);
                 Questions.Remove(SelectedQuestion);
                 SelectedQuestion = null;
-                OnPropertyChanged(nameof(SelectedQuestion));
+                OnPropertyChanged(nameof(IsWritten));
             }
         }
 
-        private void AddAnswer()
+        private void ResetNewQuestion()
         {
-            if (SelectedQuestion != null && IsMultipleChoice)
+            NewQuestion = new Question
             {
-                if (SelectedQuestion.Answers == null)
-                {
-                    SelectedQuestion.Answers = new ObservableCollection<Answer>();
-                }
-
-                var newAnswer = new Answer { Text = "Nová odpověď", IsCorrect = false };
-                SelectedQuestion.Answers.Add(newAnswer);
-                SelectedAnswer = newAnswer; // ✅ Automaticky vybereme nově přidanou odpověď
-                OnPropertyChanged(nameof(SelectedQuestion.Answers));
-            }
+                Text = "",
+                Type = QuestionType.Written,
+                KnowledgeClass = 3,
+                Answers = new ObservableCollection<Answer>()
+            };
         }
 
-        private void DeleteAnswer()
-        {
-            if (SelectedQuestion != null && SelectedQuestion.Answers.Count > 0)
-            {
-                SelectedQuestion.Answers.RemoveAt(SelectedQuestion.Answers.Count - 1);
-                OnPropertyChanged(nameof(SelectedQuestion));
-            }
-        }
-
-        private void OnPropertyChanged(string propertyName)
-        {
+        private void OnPropertyChanged(string propertyName) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

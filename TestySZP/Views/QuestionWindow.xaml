@@ -2,93 +2,73 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:TestySZP.Helpers"
-        Title="Správa otázek" Height="600" Width="700">
+        Title="Správa otázek" Height="700" Width="750">
 
     <Window.Resources>
-        <local:InvertBoolConverter x:Key="InvertBoolConverter"/>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:QuestionTypeToBoolConverter x:Key="QuestionTypeToBoolConverter"/>
+
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="10">
 
-        <!-- Seznam otázek -->
-        <ListView ItemsSource="{Binding Questions}" 
-                  SelectedItem="{Binding SelectedQuestion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  Grid.Row="0" Height="250">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Text otázky" DisplayMemberBinding="{Binding Text}" Width="300"/>
-                    <GridViewColumn Header="Třída" DisplayMemberBinding="{Binding KnowledgeClass}" Width="50"/>
-                    <GridViewColumn Header="Typ otázky" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+            <!-- FORMULÁŘ: Přidání nové otázky -->
+            <GroupBox Header="Přidání nové otázky">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Text otázky:"/>
+                    <TextBox Text="{Binding NewQuestion.Text, UpdateSourceTrigger=PropertyChanged}" Width="600"/>
 
-        <!-- Formulář pro úpravu otázek -->
-        <StackPanel Grid.Row="1" Margin="10">
-            <TextBlock Text="Text otázky:"/>
-            <TextBox Text="{Binding SelectedQuestion.Text, UpdateSourceTrigger=PropertyChanged}" Width="400"/>
+                    <TextBlock Text="Třída znalostí:"/>
+                    <ComboBox ItemsSource="{Binding KnowledgeLevels}"
+                              SelectedItem="{Binding NewQuestion.KnowledgeClass, Mode=TwoWay}" Width="100"/>
 
-            <TextBlock Text="Třída znalostí:"/>
-            <ComboBox ItemsSource="{Binding KnowledgeLevels}" 
-                      SelectedItem="{Binding SelectedQuestion.KnowledgeClass, Mode=TwoWay}" 
-                      Width="100"/>
+                    <CheckBox Content="Otázka je typu Written"
+          IsChecked="{Binding NewQuestion.Type, Mode=TwoWay, Converter={StaticResource QuestionTypeToBoolConverter}}"/>
 
-            <TextBlock Text="Typ otázky:"/>
-            <StackPanel Orientation="Horizontal">
-                <RadioButton Content="Multiple Choice" 
-                 IsChecked="{Binding IsMultipleChoice, Mode=TwoWay}"
-                 IsEnabled="{Binding SelectedQuestion}"/>
-                <RadioButton Content="Written" 
-                 IsChecked="{Binding IsMultipleChoice, Mode=TwoWay, Converter={StaticResource InvertBoolConverter}}"
-                 IsEnabled="{Binding SelectedQuestion}"/>
-            </StackPanel>
+                    <Button Content="Přidat otázku" Command="{Binding AddQuestionCommand}" Width="120" Margin="0,10,0,0"/>
+                </StackPanel>
+            </GroupBox>
 
-            <!-- Seznam odpovědí, viditelný pouze pokud je typ otázky Multiple Choice -->
-            <StackPanel Visibility="{Binding IsMultipleChoice, Converter={StaticResource BoolToVisibilityConverter}}">
-                <TextBlock Text="Odpovědi:"/>
-                <ListView ItemsSource="{Binding SelectedQuestion.Answers}" 
-              SelectedItem="{Binding SelectedAnswer, Mode=TwoWay}" 
-              Height="150">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Text odpovědi" DisplayMemberBinding="{Binding Text}" Width="300"/>
-                            <GridViewColumn Header="Správná" Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsCorrect, Mode=TwoWay}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+            <!-- SEZNAM OTÁZEK -->
+            <GroupBox Header="Seznam otázek" Margin="0,20,0,0">
+                <StackPanel>
+                    <ListView ItemsSource="{Binding Questions}"
+                              SelectedItem="{Binding SelectedQuestion, Mode=TwoWay}"
+                              Height="200">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Text otázky" DisplayMemberBinding="{Binding Text}" Width="350"/>
+                                <GridViewColumn Header="Třída" DisplayMemberBinding="{Binding KnowledgeClass}" Width="50"/>
+                                <GridViewColumn Header="Typ" DisplayMemberBinding="{Binding Type}" Width="120"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </StackPanel>
+            </GroupBox>
 
-                <!-- Formulář pro úpravu vybrané odpovědi -->
-                <StackPanel Orientation="Vertical" Margin="10,0,0,0">
-                    <TextBlock Text="Text odpovědi:"/>
-                    <TextBox Text="{Binding SelectedAnswer.Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="300"/>
+            <!-- FORMULÁŘ: Úprava vybrané otázky -->
+            <GroupBox Header="Úprava vybrané otázky"
+                      Visibility="{Binding IsQuestionSelected, Converter={StaticResource BoolToVisibilityConverter}}"
+                      Margin="0,20,0,0">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Text otázky:"/>
+                    <TextBox Text="{Binding SelectedQuestion.Text, UpdateSourceTrigger=PropertyChanged}" Width="600"/>
 
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox Content="Správná odpověď" IsChecked="{Binding SelectedAnswer.IsCorrect, Mode=TwoWay}"/>
+                    <TextBlock Text="Třída znalostí:"/>
+                    <ComboBox ItemsSource="{Binding KnowledgeLevels}"
+                              SelectedItem="{Binding SelectedQuestion.KnowledgeClass, Mode=TwoWay}" Width="100"/>
+
+                    <CheckBox Content="Otázka je typu Written"
+          IsChecked="{Binding IsSelectedWritten, Mode=TwoWay}"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Upravit otázku" Command="{Binding UpdateQuestionCommand}" Width="120"/>
+                        <Button Content="Smazat otázku" Command="{Binding DeleteQuestionCommand}" Width="120" Margin="10,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
+            </GroupBox>
 
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="Přidat odpověď" Command="{Binding AddAnswerCommand}" Width="120"/>
-                    <Button Content="Smazat odpověď" Command="{Binding DeleteAnswerCommand}" Width="120"/>
-                </StackPanel>
-            </StackPanel>
-
-            <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
-                <Button Content="Přidat otázku" Command="{Binding AddQuestionCommand}" Width="120"/>
-                <Button Content="Upravit otázku" Command="{Binding UpdateQuestionCommand}" Width="120"/>
-                <Button Content="Smazat otázku" Command="{Binding DeleteQuestionCommand}" Width="120"/>
-            </StackPanel>
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Window>

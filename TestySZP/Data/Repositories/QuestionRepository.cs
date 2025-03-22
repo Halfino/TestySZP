@@ -102,37 +102,22 @@ namespace TestySZP.Data.Repositories
             using (var connection = DatabaseHelper.GetConnection())
             {
                 connection.Open();
-                string updateQuery = "UPDATE Questions SET text = @text, type = @type, knowledge_class = @knowledge_class WHERE id = @id";
-                using (var cmd = new SQLiteCommand(updateQuery, connection))
+                using (var command = new SQLiteCommand(connection))
                 {
-                    cmd.Parameters.AddWithValue("@id", question.Id);
-                    cmd.Parameters.AddWithValue("@text", question.Text);
-                    cmd.Parameters.AddWithValue("@type", (int)question.Type);
-                    cmd.Parameters.AddWithValue("@knowledge_class", question.KnowledgeClass);
-                    cmd.ExecuteNonQuery();
-                }
+                    command.CommandText = @"
+                UPDATE Questions
+                SET text = @text,
+                    knowledge_class = @class,
+                    type = @type
+                WHERE id = @id";
 
-                // Smazání starých odpovědí a přidání nových
-                string deleteAnswersQuery = "DELETE FROM Answers WHERE question_id = @id";
-                using (var cmd = new SQLiteCommand(deleteAnswersQuery, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", question.Id);
-                    cmd.ExecuteNonQuery();
-                }
+                    command.Parameters.AddWithValue("@text", question.Text);
+                    command.Parameters.AddWithValue("@class", question.KnowledgeClass);
+                    command.Parameters.AddWithValue("@type", (int)question.Type);
+                    command.Parameters.AddWithValue("@id", question.Id);
 
-                foreach (var answer in question.Answers)
-                {
-                    string insertAnswerQuery = "INSERT INTO Answers (question_id, text, is_correct) VALUES (@question_id, @text, @is_correct)";
-                    using (var cmd = new SQLiteCommand(insertAnswerQuery, connection))
-                    {
-                        cmd.Parameters.AddWithValue("@question_id", question.Id);
-                        cmd.Parameters.AddWithValue("@text", answer.Text);
-                        cmd.Parameters.AddWithValue("@is_correct", answer.IsCorrect);
-                        cmd.ExecuteNonQuery();
-                    }
+                    command.ExecuteNonQuery();
                 }
-
-                connection.Close();
             }
         }
 
@@ -256,6 +241,34 @@ namespace TestySZP.Data.Repositories
             }
             return questions;
         }
+
+        public static Question GetById(int id)
+        {
+            using (var connection = DatabaseHelper.GetConnection())
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand("SELECT id, text, type, knowledge_class FROM Questions WHERE id = @id", connection))
+                {
+                    command.Parameters.AddWithValue("@id", id);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new Question
+                            {
+                                Id = reader.GetInt32(0),
+                                Text = reader.GetString(1),
+                                Type = (QuestionType)reader.GetInt32(2),
+                                KnowledgeClass = reader.GetInt32(3),
+                                Answers = new ObservableCollection<Answer>() // budeš případně doplňovat
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
 
 
 
