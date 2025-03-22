@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TestySZP.Data.Repositories;
 using TestySZP.Models;
@@ -10,71 +11,65 @@ namespace TestySZP.Services
     {
         public List<Question> GenerateTestForPerson(Person person, int totalQuestions)
         {
-            var selectedQuestions = new List<Question>();
+            var allAvailable = QuestionRepository
+                .GetAllQuestions()
+                .Where(q => q.KnowledgeClass <= person.KnowledgeClass)
+                .ToList();
+
+            if (!allAvailable.Any())
+                return new List<Question>(); // žádné dostupné otázky
+
             var random = new Random();
 
-            int requiredFromMainClass = (int)Math.Ceiling(totalQuestions * 0.2);
+            // Rozdělení otázek podle třídy
+            var mainClassQuestions = allAvailable
+                .Where(q => q.KnowledgeClass == person.KnowledgeClass)
+                .OrderBy(q => random.Next())
+                .ToList();
 
-            // 1) Vyber otázky z hlavní třídy
-            var mainClassQuestions = QuestionRepository.GetQuestionsForClass(person.KnowledgeClass)
-                                                       .OrderBy(q => random.Next()).ToList();
+            var lowerClassQuestions = allAvailable
+                .Where(q => q.KnowledgeClass < person.KnowledgeClass)
+                .OrderBy(q => random.Next())
+                .ToList();
 
-            foreach (var q in mainClassQuestions)
-            {
-                if (selectedQuestions.Count >= requiredFromMainClass)
-                    break;
+            // Výpočet 20 % z hlavní třídy (zaokrouhleno nahoru)
+            int minMainCount = (int)Math.Ceiling(totalQuestions * 0.2);
 
-                TryAddUnique(selectedQuestions, q);
-            }
+            var selectedQuestions = new List<Question>();
 
-            // 2) Vyber otázky z nižších tříd
-            var lowerQuestions = QuestionRepository.GetLowerClassQuestions(person.KnowledgeClass)
-                                                   .OrderBy(q => random.Next()).ToList();
+            // Přidej otázky z hlavní třídy
+            selectedQuestions.AddRange(mainClassQuestions.Take(minMainCount));
 
-            foreach (var q in lowerQuestions)
-            {
-                if (selectedQuestions.Count >= totalQuestions)
-                    break;
+            // Pokud jich není dost, použij všechny a zapamatuj si, kolik chybí
+            int missing = minMainCount - mainClassQuestions.Count;
+            if (missing > 0)
+                Debug.WriteLine($"Chybí {missing} otázek z hlavní třídy, použity všechny dostupné.");
 
-                TryAddUnique(selectedQuestions, q);
-            }
-
-            // 3) Znovu zkus použít z hlavní třídy, pokud nebyly dříve použity všechny
-            foreach (var q in mainClassQuestions)
+            // Doplnění z nižších tříd
+            foreach (var q in lowerClassQuestions)
             {
                 if (selectedQuestions.Count >= totalQuestions)
                     break;
 
-                TryAddUnique(selectedQuestions, q);
+                if (!selectedQuestions.Any(x => x.Id == q.Id))
+                    selectedQuestions.Add(q);
             }
 
-            // 4) Pokud stále nemáme dost, použij mix ze všech dostupných tříd ≤ dosažená
+            // Pokud stále chybí otázky, doplň mixem z celého rozsahu
             if (selectedQuestions.Count < totalQuestions)
             {
-                var additional = QuestionRepository
-                    .GetAdditionalQuestionsToFill(1000, person.KnowledgeClass)
-                    .OrderBy(q => random.Next());
-
-                foreach (var q in additional)
+                var fillPool = allAvailable.OrderBy(q => random.Next());
+                foreach (var q in fillPool)
                 {
                     if (selectedQuestions.Count >= totalQuestions)
                         break;
 
-                    TryAddUnique(selectedQuestions, q);
+                    if (!selectedQuestions.Any(x => x.Id == q.Id))
+                        selectedQuestions.Add(q);
                 }
             }
 
             return selectedQuestions;
-        }
-
-        private bool TryAddUnique(List<Question> list, Question question)
-        {
-            if (!list.Any(q => q.Id == question.Id))
-            {
-                list.Add(question);
-                return true;
-            }
-            return false;
         }
     }
 }
