@@ -1,10 +1,40 @@
-﻿namespace TestySZP.Models
+﻿using System.ComponentModel;
+
+namespace TestySZP.Models
 {
-    public class Answer
+    public class Answer : INotifyPropertyChanged
     {
-        public int Id { get; set; }
-        public int QuestionId { get; set; }
-        public string Text { get; set; }
-        public bool IsCorrect { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private int _id;
+        public int Id
+        {
+            get => _id;
+            set { _id = value; OnPropertyChanged(nameof(Id)); }
+        }
+
+        private int _questionId;
+        public int QuestionId
+        {
+            get => _questionId;
+            set { _questionId = value; OnPropertyChanged(nameof(QuestionId)); }
+        }
+
+        private string _text;
+        public string Text
+        {
+            get => _text;
+            set { _text = value; OnPropertyChanged(nameof(Text)); }
+        }
+
+        private bool _isCorrect;
+        public bool IsCorrect
+        {
+            get => _isCorrect;
+            set { _isCorrect = value; OnPropertyChanged(nameof(IsCorrect)); }
+        }
+
+        protected void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

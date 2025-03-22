@@ -1,10 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using TestySZP.Data.Repositories;
-using TestySZP.Models;
 using TestySZP.Helpers;
+using TestySZP.Models;
+using TestySZP.Views;
 
 namespace TestySZP.ViewModels
 {
@@ -34,10 +36,7 @@ namespace TestySZP.ViewModels
             set
             {
                 if (_selectedQuestion != null)
-                {
-                    // Odpojení eventu ze staré otázky
                     _selectedQuestion.PropertyChanged -= SelectedQuestion_PropertyChanged;
-                }
 
                 _selectedQuestion = value;
                 OnPropertyChanged(nameof(SelectedQuestion));
@@ -45,18 +44,7 @@ namespace TestySZP.ViewModels
                 OnPropertyChanged(nameof(IsWritten));
 
                 if (_selectedQuestion != null)
-                {
-                    // Připojení k nové
                     _selectedQuestion.PropertyChanged += SelectedQuestion_PropertyChanged;
-                }
-            }
-        }
-
-        private void SelectedQuestion_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (SelectedQuestion != null)
-            {
-                QuestionRepository.UpdateQuestion(SelectedQuestion);
             }
         }
 
@@ -82,6 +70,7 @@ namespace TestySZP.ViewModels
 
         public ICommand AddQuestionCommand { get; }
         public ICommand DeleteQuestionCommand { get; }
+        public ICommand OpenAnswerWindowCommand { get; }
 
         public QuestionViewModel()
         {
@@ -90,6 +79,7 @@ namespace TestySZP.ViewModels
 
             AddQuestionCommand = new RelayCommand(param => AddQuestion());
             DeleteQuestionCommand = new RelayCommand(param => DeleteQuestion(), param => SelectedQuestion != null);
+            OpenAnswerWindowCommand = new RelayCommand(param => OpenAnswerWindow(), param => SelectedQuestion != null);
 
             ResetNewQuestion();
         }
@@ -110,6 +100,40 @@ namespace TestySZP.ViewModels
                 SelectedQuestion = null;
                 OnPropertyChanged(nameof(IsWritten));
             }
+        }
+
+        private void OpenAnswerWindow()
+        {
+            var window = new AnswerWindow(SelectedQuestion);
+            window.ShowDialog();
+
+            // Aktualizace otázky po zavření okna
+            var updated = QuestionRepository.GetQuestionById(SelectedQuestion.Id);
+            if (updated != null)
+            {
+                var index = Questions.IndexOf(SelectedQuestion);
+                Questions[index] = updated;
+                SelectedQuestion = updated;
+            }
+        }
+
+        private void SelectedQuestion_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (SelectedQuestion != null)
+            {
+                QuestionRepository.UpdateQuestion(SelectedQuestion);
+                RefreshQuestionList(SelectedQuestion.Id);
+            }
+        }
+
+        private void RefreshQuestionList(int idToRestore)
+        {
+            var allQuestions = QuestionRepository.GetAllQuestions();
+            Questions.Clear();
+            foreach (var q in allQuestions)
+                Questions.Add(q);
+
+            SelectedQuestion = Questions.FirstOrDefault(q => q.Id == idToRestore);
         }
 
         private void ResetNewQuestion()

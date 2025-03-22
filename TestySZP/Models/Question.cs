@@ -35,6 +35,18 @@ namespace TestySZP.Models
             set { _knowledgeClass = value; OnPropertyChanged(nameof(KnowledgeClass)); }
         }
 
+        private int _answerCount;
+        public int AnswerCount
+        {
+            get => _answerCount;
+            set
+            {
+                _answerCount = value;
+                OnPropertyChanged(nameof(AnswerCount));
+            }
+        }
+
+
         private ObservableCollection<Answer> _answers = new();
         public ObservableCollection<Answer> Answers
         {

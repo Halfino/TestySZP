@@ -25,7 +25,8 @@ namespace TestySZP.Data.Repositories
                             Id = reader.GetInt32(0),
                             Text = reader.GetString(1),
                             IsWritten = reader.GetBoolean(2),
-                            KnowledgeClass = reader.GetInt32(3)
+                            KnowledgeClass = reader.GetInt32(3),
+                            AnswerCount = GetAnswerCount(reader.GetInt32(0)) // doplníme funkci
                         });
                     }
                 }
@@ -182,6 +183,38 @@ namespace TestySZP.Data.Repositories
             }
 
             return result;
+        }
+
+        public static Question GetQuestionById(int id)
+        {
+            using var connection = DatabaseHelper.GetConnection();
+            connection.Open();
+            using var command = new SQLiteCommand("SELECT * FROM Questions WHERE id = @id", connection);
+            command.Parameters.AddWithValue("@id", id);
+            using var reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                return new Question
+                {
+                    Id = reader.GetInt32(0),
+                    Text = reader.GetString(1),
+                    IsWritten = reader.GetBoolean(2),
+                    KnowledgeClass = reader.GetInt32(3),
+                    AnswerCount = GetAnswerCount(reader.GetInt32(0))
+                };
+            }
+
+            return null;
+        }
+
+        private static int GetAnswerCount(int questionId)
+        {
+            using var connection = DatabaseHelper.GetConnection();
+            connection.Open();
+            using var command = new SQLiteCommand("SELECT COUNT(*) FROM Answers WHERE question_id = @id", connection);
+            command.Parameters.AddWithValue("@id", questionId);
+            return Convert.ToInt32(command.ExecuteScalar());
         }
     }
 }
