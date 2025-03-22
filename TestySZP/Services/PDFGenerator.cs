@@ -22,8 +22,10 @@ namespace TestySZP.Services
             Font normalFont = new Font(baseFont, 12, Font.NORMAL);
 
             // Úvod
-            document.Add(new Paragraph($"Test pro: {person.Name}", titleFont));
-            document.Add(new Paragraph($"Třída znalostí: {person.KnowledgeClass}", normalFont));
+            document.Add(new Paragraph($"Kontrolní test SZP", titleFont) {Alignment = Element.ALIGN_CENTER });
+            document.Add(new Paragraph("\n"));
+            document.Add(new Paragraph($"Jméno a příjmení: {person.Name}", titleFont));
+            document.Add(new Paragraph($"Dosažená třída: {person.KnowledgeClass}", normalFont));
             document.Add(new Paragraph($"Datum:"));
             document.Add(new Paragraph($"Podpis:"));
             document.Add(new Paragraph("\n"));
@@ -73,7 +75,7 @@ namespace TestySZP.Services
 
             // Nová stránka: klíč
             document.NewPage();
-            document.Add(new Paragraph("Správné odpovědi:", titleFont));
+            document.Add(new Paragraph($"Správné odpovědi test {person.Name}:", titleFont));
             document.Add(new Paragraph("\n"));
 
             foreach (var entry in answerKey)
