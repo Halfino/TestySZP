@@ -25,5 +25,10 @@ namespace TestySZP.Views
             InitializeComponent();
             DataContext = new QuestionViewModel(); // ✅ Nastavení DataContext
         }
+
+        private void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

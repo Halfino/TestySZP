@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -10,12 +11,15 @@ namespace TestySZP.Services
     {
         public static void GenerateTestPDF(Person person, List<Question> questions, string filePath)
         {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             Document document = new Document(PageSize.A4, 50, 50, 50, 50);
             PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(filePath, FileMode.Create));
             document.Open();
 
-            Font titleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
-            Font normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 12);
+            string fontPath = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Fonts", "arial.ttf");
+            BaseFont baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            Font titleFont = new Font(baseFont, 16, Font.BOLD);
+            Font normalFont = new Font(baseFont, 12, Font.NORMAL);
 
             // Úvod
             document.Add(new Paragraph($"Test pro: {person.Name}", titleFont));
@@ -24,46 +28,50 @@ namespace TestySZP.Services
             document.Add(new Paragraph($"Podpis:"));
             document.Add(new Paragraph("\n"));
 
-            int questionNumber = 1;
+            int questionNumber = 0;
             Dictionary<int, string> answerKey = new();
 
             foreach (var question in questions)
             {
-                // Blok otázky s odpověďmi – aby se nerozdělil přes dvě stránky
+                questionNumber++;
+
+                Debug.WriteLine($"[PDF] Otázka {questionNumber}: ID={question.Id}, Written={question.IsWritten}, Odpovědi={question.Answers?.Count}");
+
+                // Tabulka s jedním sloupcem pro otázku + odpovědi
                 PdfPTable table = new PdfPTable(1);
                 table.WidthPercentage = 100;
+
                 PdfPCell cell = new PdfPCell { Border = Rectangle.NO_BORDER };
 
-                // Otázka
+                // Text otázky
                 cell.AddElement(new Paragraph($"{questionNumber}. {question.Text}", normalFont));
                 cell.AddElement(new Paragraph(" "));
 
-                if (!question.IsWritten)
+                if (!question.IsWritten && question.Answers != null && question.Answers.Count > 0)
                 {
                     char optionLabel = 'A';
                     foreach (var answer in question.Answers)
                     {
-                        cell.AddElement(new Paragraph($"   {optionLabel}) {answer.Text}", normalFont));
-
+                        cell.AddElement(new Paragraph($" {optionLabel}) {answer.Text}", normalFont));
                         if (answer.IsCorrect)
                             answerKey[questionNumber] = optionLabel.ToString();
-
                         optionLabel++;
                     }
                 }
                 else
                 {
+                    // Otázka s otevřenou odpovědí nebo bez odpovědí
                     for (int i = 0; i < 5; i++)
                         cell.AddElement(new Paragraph(" "));
                 }
 
+                // Přidej otázku do dokumentu
                 table.AddCell(cell);
                 document.Add(table);
-                document.Add(new Paragraph(" "));
-                questionNumber++;
+                document.Add(new Paragraph("\n"));
             }
 
-            // Klíč na nové stránce
+            // Nová stránka: klíč
             document.NewPage();
             document.Add(new Paragraph("Správné odpovědi:", titleFont));
             document.Add(new Paragraph("\n"));

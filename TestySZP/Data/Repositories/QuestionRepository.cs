@@ -20,20 +20,48 @@ namespace TestySZP.Data.Repositories
                 {
                     while (reader.Read())
                     {
-                        questions.Add(new Question
+                        var question = new Question
                         {
                             Id = reader.GetInt32(0),
                             Text = reader.GetString(1),
                             IsWritten = reader.GetBoolean(2),
                             KnowledgeClass = reader.GetInt32(3),
-                            AnswerCount = GetAnswerCount(reader.GetInt32(0)) // doplníme funkci
-                        });
+                            Answers = new System.Collections.ObjectModel.ObservableCollection<Answer>(),
+                            AnswerCount = 0
+                        };
+
+                        // načtení odpovědí
+                        using (var ansConn = DatabaseHelper.GetConnection())
+                        {
+                            ansConn.Open();
+                            using (var ansCmd = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", ansConn))
+                            {
+                                ansCmd.Parameters.AddWithValue("@id", question.Id);
+                                using (var ansReader = ansCmd.ExecuteReader())
+                                {
+                                    while (ansReader.Read())
+                                    {
+                                        question.Answers.Add(new Answer
+                                        {
+                                            Id = ansReader.GetInt32(0),
+                                            QuestionId = ansReader.GetInt32(1),
+                                            Text = ansReader.GetString(2),
+                                            IsCorrect = ansReader.GetBoolean(3)
+                                        });
+                                    }
+                                }
+                            }
+                        }
+
+                        question.AnswerCount = question.Answers.Count;
+                        questions.Add(question);
                     }
                 }
             }
 
             return questions;
         }
+
 
         public static void AddQuestion(Question question)
         {

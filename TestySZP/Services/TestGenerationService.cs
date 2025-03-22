@@ -13,9 +13,12 @@ namespace TestySZP.Services
         {
             var allAvailable = QuestionRepository
                 .GetAllQuestions()
-                .Where(q => q.KnowledgeClass <= person.KnowledgeClass)
+                .Where(q => q.KnowledgeClass >= person.KnowledgeClass)
                 .ToList();
-
+            foreach (var q in allAvailable)
+            {
+                Debug.WriteLine($"[ALL] ID={q.Id}, Class={q.KnowledgeClass}, Written={q.IsWritten}, Answers={q.Answers?.Count}");
+            }
             if (!allAvailable.Any())
                 return new List<Question>(); // žádné dostupné otázky
 
@@ -28,7 +31,7 @@ namespace TestySZP.Services
                 .ToList();
 
             var lowerClassQuestions = allAvailable
-                .Where(q => q.KnowledgeClass < person.KnowledgeClass)
+                .Where(q => q.KnowledgeClass > person.KnowledgeClass)
                 .OrderBy(q => random.Next())
                 .ToList();
 
@@ -67,6 +70,10 @@ namespace TestySZP.Services
                     if (!selectedQuestions.Any(x => x.Id == q.Id))
                         selectedQuestions.Add(q);
                 }
+            }
+            foreach (var q in selectedQuestions)
+            {
+                Debug.WriteLine($"ID={q.Id}, Text={q.Text}, Written={q.IsWritten}, Answers={q.Answers?.Count}");
             }
 
             return selectedQuestions;

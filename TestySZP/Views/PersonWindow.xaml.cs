@@ -10,5 +10,11 @@ namespace TestySZP.Views
             InitializeComponent();
             DataContext = new PersonViewModel();
         }
+
+        private void CloseWindow(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
     }
 }

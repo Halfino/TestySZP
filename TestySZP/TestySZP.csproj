@@ -9,6 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\arial.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Fonts\arial.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="iTextSharp" Version="5.5.13.4" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
   </ItemGroup>
