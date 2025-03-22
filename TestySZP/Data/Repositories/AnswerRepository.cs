@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using TestySZP.Models;
 using TestySZP.Data;
 

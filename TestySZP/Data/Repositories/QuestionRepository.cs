@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using TestySZP.Models;
-using TestySZP.Data;
-using System.Linq;
 
 namespace TestySZP.Data.Repositories
 {
@@ -122,7 +119,7 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
- 
+
                 using (var command = new SQLiteCommand("SELECT * FROM Questions WHERE knowledge_class = @class", connection))
                 {
                     command.Parameters.AddWithValue("@class", classLevel);
@@ -145,7 +142,7 @@ namespace TestySZP.Data.Repositories
             {
                 using (var connection = DatabaseHelper.GetConnection())
                 {
-  
+
                     using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
                     {
                         command.Parameters.AddWithValue("@id", question.Id);
@@ -167,7 +164,7 @@ namespace TestySZP.Data.Repositories
             }
 
 
-                return result;
+            return result;
         }
 
         public static List<Question> GetRemainingQuestionsForTest(int classLevel, int count)

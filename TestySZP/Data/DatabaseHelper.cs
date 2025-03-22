@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.SQLite;
+﻿using System.Data.SQLite;
 using System.IO;
 
 namespace TestySZP.Data
@@ -34,21 +33,21 @@ namespace TestySZP.Data
                     connection.Open();
 
                     string createQuestionsTable = @"
-CREATE TABLE IF NOT EXISTS Questions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT NOT NULL,
-    written BOOLEAN NOT NULL, -- true = Written, false = MultipleChoice
-    knowledge_class INTEGER NOT NULL -- 1 = Nejvyšší, 3 = Nejnižší
-);";
+                    CREATE TABLE IF NOT EXISTS Questions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        text TEXT NOT NULL,
+                        written BOOLEAN NOT NULL, -- true = Written, false = MultipleChoice
+                        knowledge_class INTEGER NOT NULL -- 1 = Nejvyšší, 3 = Nejnižší
+                    );";
 
                     string createAnswersTable = @"
-CREATE TABLE IF NOT EXISTS Answers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    question_id INTEGER NOT NULL,
-    text TEXT NOT NULL,
-    is_correct BOOLEAN NOT NULL,
-    FOREIGN KEY (question_id) REFERENCES Questions(id) ON DELETE CASCADE
-);";
+                    CREATE TABLE IF NOT EXISTS Answers (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        question_id INTEGER NOT NULL,
+                        text TEXT NOT NULL,
+                        is_correct BOOLEAN NOT NULL,
+                        FOREIGN KEY (question_id) REFERENCES Questions(id) ON DELETE CASCADE
+                    );";
 
                     string createPersonsTable = @"
                     CREATE TABLE IF NOT EXISTS Persons (
