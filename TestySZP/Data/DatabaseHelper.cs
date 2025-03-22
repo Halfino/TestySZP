@@ -28,7 +28,7 @@ namespace TestySZP.Data
 CREATE TABLE IF NOT EXISTS Questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     text TEXT NOT NULL,
-    type INTEGER NOT NULL, -- 1 = Multiple Choice, 2 = Written
+    written BOOLEAN NOT NULL, -- true = Written, false = MultipleChoice
     knowledge_class INTEGER NOT NULL -- 1 = Nejvyšší, 3 = Nejnižší
 );";
 

@@ -46,15 +46,15 @@ namespace TestySZP.ViewModels
         {
             get
             {
-                if (SelectedQuestion != null) return SelectedQuestion.Type == QuestionType.Written;
-                return NewQuestion?.Type == QuestionType.Written;
+                if (SelectedQuestion != null) return SelectedQuestion.IsWritten;
+                return NewQuestion?.IsWritten ?? false;
             }
             set
             {
                 if (SelectedQuestion != null)
-                    SelectedQuestion.Type = value ? QuestionType.Written : QuestionType.MultipleChoice;
+                    SelectedQuestion.IsWritten = value;
                 else if (NewQuestion != null)
-                    NewQuestion.Type = value ? QuestionType.Written : QuestionType.MultipleChoice;
+                    NewQuestion.IsWritten = value;
 
                 OnPropertyChanged(nameof(IsWritten));
             }
@@ -88,23 +88,18 @@ namespace TestySZP.ViewModels
             if (SelectedQuestion == null)
                 return;
 
-            // Uložíme změnu do DB
+            int idToRestore = SelectedQuestion.Id;
+
             QuestionRepository.UpdateQuestion(SelectedQuestion);
 
-            // Najdeme otázku v kolekci a ručně přepíšeme její hodnoty
-            var updatedFromDb = QuestionRepository.GetById(SelectedQuestion.Id);
-            var questionInList = Questions.FirstOrDefault(q => q.Id == SelectedQuestion.Id);
+            // Refresh kolekce
+            var allQuestions = QuestionRepository.GetAllQuestions();
+            Questions.Clear();
+            foreach (var q in allQuestions)
+                Questions.Add(q);
 
-            if (questionInList != null && updatedFromDb != null)
-            {
-                questionInList.Text = updatedFromDb.Text;
-                questionInList.Type = updatedFromDb.Type;
-                questionInList.KnowledgeClass = updatedFromDb.KnowledgeClass;
-
-                // Oznámíme změnu UI
-                OnPropertyChanged(nameof(Questions));
-                SelectedQuestion = questionInList;
-            }
+            // Teď bezpečně obnovíme výběr
+            SelectedQuestion = Questions.FirstOrDefault(q => q.Id == idToRestore);
         }
 
 
@@ -124,7 +119,7 @@ namespace TestySZP.ViewModels
             NewQuestion = new Question
             {
                 Text = "",
-                Type = QuestionType.Written,
+                IsWritten = true,
                 KnowledgeClass = 3,
                 Answers = new ObservableCollection<Answer>()
             };
