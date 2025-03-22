@@ -74,6 +74,10 @@ namespace TestySZP.Data.Repositories
                     command.Parameters.AddWithValue("@written", question.IsWritten);
                     command.Parameters.AddWithValue("@class", question.KnowledgeClass);
                     command.ExecuteNonQuery();
+
+                    // ExecuteScalar vrací ID právě vloženého záznamu
+                    long insertedId = (long)command.ExecuteScalar();
+                    question.Id = (int)insertedId;
                 }
             }
         }

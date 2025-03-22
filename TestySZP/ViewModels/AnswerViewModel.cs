@@ -43,6 +43,10 @@ namespace TestySZP.ViewModels
 
                 if (_selectedAnswer != null)
                     _selectedAnswer.PropertyChanged += SelectedAnswer_PropertyChanged;
+
+                // >>> ZAJISTÍ ODEMČENÍ TLAČÍTKA
+                if (DeleteAnswerCommand is RelayCommand deleteCmd)
+                    deleteCmd.RaiseCanExecuteChanged();
             }
         }
 
