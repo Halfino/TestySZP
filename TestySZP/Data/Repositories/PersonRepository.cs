@@ -7,6 +7,31 @@ namespace TestySZP.Data.Repositories
 {
     public static class PersonRepository
     {
+
+        public static List<Person> GetAll()
+        {
+            var people = new List<Person>();
+
+            using var connection = DatabaseHelper.GetConnection();
+            connection.Open();
+
+            using var command = new SQLiteCommand("SELECT * FROM Persons", connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                people.Add(new Person
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    KnowledgeClass = reader.GetInt32(2),
+                    ValidUntil = reader.GetDateTime(3)
+                });
+            }
+
+            return people;
+        }
+
         public static void AddPerson(Person person)
         {
             using (var connection = DatabaseHelper.GetConnection())

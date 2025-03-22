@@ -24,15 +24,12 @@ namespace TestySZP.Views
         }
 
         // Generování testu
-        private void GenerateTest(object sender, RoutedEventArgs e)
+        private void OpenGenerateTestWindow_Click(object sender, RoutedEventArgs e)
         {
-            Person testPerson = new Person { Id = 1, Name = "Jan Novák", KnowledgeClass = 2 };
-            var testQuestions = _testService.GenerateTestForPerson(testPerson, 10);
-
-            string message = $"Vygenerován test pro: {testPerson.Name}\n";
-            message += $"Počet otázek: {testQuestions.Count}";
-            MessageBox.Show(message, "Generování testu", MessageBoxButton.OK, MessageBoxImage.Information);
+            var window = new GenerateTestWindow();
+            window.ShowDialog();
         }
+
 
         // Ukončení aplikace
         private void CloseApp(object sender, RoutedEventArgs e)

@@ -7,7 +7,9 @@
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
             <Button Content="Správa osob" Command="{Binding OpenPersonManagementCommand}" Width="200" Height="50" Margin="0,5"/>
             <Button Content="Správa otázek" Command="{Binding OpenQuestionManagementCommand}" Width="200" Height="50" Margin="0,5"/>
-            <Button Content="Generovat testy" Command="{Binding OpenTestGenerationCommand}" Width="200" Height="50" Margin="0,5"/>
+            <Button Content="Generování testu"
+        Click="OpenGenerateTestWindow_Click"
+        Width="200" Height="50" Margin="0,5"/>
         </StackPanel>
     </Grid>
 </Window>
