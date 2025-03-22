@@ -282,6 +282,64 @@ namespace TestySZP.Data.Repositories
             return null;
         }
 
+        public static List<Question> GetLowerClassQuestions(int classLevel)
+        {
+            var result = new List<Question>();
+
+            using (var connection = DatabaseHelper.GetConnection())
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand(@"
+            SELECT * FROM Questions 
+            WHERE knowledge_class < @class", connection))
+                {
+                    command.Parameters.AddWithValue("@class", classLevel);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            result.Add(new Question
+                            {
+                                Id = reader.GetInt32(0),
+                                Text = reader.GetString(1),
+                                IsWritten = reader.GetBoolean(2),
+                                KnowledgeClass = reader.GetInt32(3)
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Načtení odpovědí
+            foreach (var question in result)
+            {
+                using (var connection = DatabaseHelper.GetConnection())
+                {
+                    connection.Open();
+                    using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
+                    {
+                        command.Parameters.AddWithValue("@id", question.Id);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                question.Answers.Add(new Answer
+                                {
+                                    Id = reader.GetInt32(0),
+                                    QuestionId = reader.GetInt32(1),
+                                    Text = reader.GetString(2),
+                                    IsCorrect = reader.GetBoolean(3)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
         private static int GetAnswerCount(int questionId)
         {
             using var connection = DatabaseHelper.GetConnection();
@@ -290,5 +348,7 @@ namespace TestySZP.Data.Repositories
             command.Parameters.AddWithValue("@id", questionId);
             return Convert.ToInt32(command.ExecuteScalar());
         }
+
+
     }
 }

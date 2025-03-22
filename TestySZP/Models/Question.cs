@@ -53,6 +53,21 @@ namespace TestySZP.Models
             set { _answers = value; OnPropertyChanged(nameof(Answers)); }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is Question other)
+            {
+                return this.Id == other.Id;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode();
+        }
+
+
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }

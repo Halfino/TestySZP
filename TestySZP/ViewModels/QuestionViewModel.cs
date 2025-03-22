@@ -45,6 +45,9 @@ namespace TestySZP.ViewModels
 
                 if (_selectedQuestion != null)
                     _selectedQuestion.PropertyChanged += SelectedQuestion_PropertyChanged;
+
+                ((RelayCommand)DeleteQuestionCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)OpenAnswerWindowCommand).RaiseCanExecuteChanged();
             }
         }
 
