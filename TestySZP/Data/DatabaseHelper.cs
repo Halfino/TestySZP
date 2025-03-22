@@ -22,6 +22,14 @@ namespace TestySZP.Data
             return connection;
         }
 
+        public static SQLiteConnection GetConnectionNoPragma()
+        {
+            var connection = new SQLiteConnection(ConnectionString);
+            connection.Open();
+
+            return connection;
+        }
+
         public static void InitializeDatabase()
         {
             if (!File.Exists(DbFile))

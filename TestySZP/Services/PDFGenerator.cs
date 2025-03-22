@@ -19,7 +19,7 @@ namespace TestySZP.Services
             BaseFont baseFont = BaseFont.CreateFont(fontPath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font titleFont = new Font(baseFont, 16, Font.BOLD);
             Font normalFont = new Font(baseFont, 12, Font.NORMAL);
-
+            Font boldFont = new Font(baseFont, 12, Font.BOLD);
             // Úvod
             document.Add(new Paragraph($"Kontrolní test SZP", titleFont) { Alignment = Element.ALIGN_CENTER });
             document.Add(new Paragraph("\n"));
@@ -36,8 +36,6 @@ namespace TestySZP.Services
             {
                 questionNumber++;
 
-                Debug.WriteLine($"[PDF] Otázka {questionNumber}: ID={question.Id}, Written={question.IsWritten}, Odpovědi={question.Answers?.Count}");
-
                 // Tabulka s jedním sloupcem pro otázku + odpovědi
                 PdfPTable table = new PdfPTable(1);
                 table.WidthPercentage = 100;
@@ -45,7 +43,7 @@ namespace TestySZP.Services
                 PdfPCell cell = new PdfPCell { Border = Rectangle.NO_BORDER };
 
                 // Text otázky
-                cell.AddElement(new Paragraph($"{questionNumber}. {question.Text}", normalFont));
+                cell.AddElement(new Paragraph($"{questionNumber}. {question.Text}", boldFont));
                 cell.AddElement(new Paragraph(" "));
 
                 if (!question.IsWritten && question.Answers != null && question.Answers.Count > 0)

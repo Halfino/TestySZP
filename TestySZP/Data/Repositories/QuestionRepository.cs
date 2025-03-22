@@ -9,7 +9,7 @@ namespace TestySZP.Data.Repositories
         {
             var questions = new List<Question>();
 
-            using (var connection = DatabaseHelper.GetConnection())
+            using (var connection = DatabaseHelper.GetConnectionNoPragma())
             {
 
                 using (var command = new SQLiteCommand("SELECT * FROM Questions", connection))
@@ -63,22 +63,19 @@ namespace TestySZP.Data.Repositories
         public static void AddQuestion(Question question)
         {
             using (var connection = DatabaseHelper.GetConnection())
+            using (var command = new SQLiteCommand(connection))
             {
+                command.CommandText = @"
+                    INSERT INTO Questions (text, written, knowledge_class)
+                    VALUES (@text, @written, @class);
+                    SELECT last_insert_rowid();";
 
-                using (var command = new SQLiteCommand(connection))
-                {
-                    command.CommandText = @"
-                        INSERT INTO Questions (text, written, knowledge_class)
-                        VALUES (@text, @written, @class)";
-                    command.Parameters.AddWithValue("@text", question.Text);
-                    command.Parameters.AddWithValue("@written", question.IsWritten);
-                    command.Parameters.AddWithValue("@class", question.KnowledgeClass);
-                    command.ExecuteNonQuery();
+                command.Parameters.AddWithValue("@text", question.Text);
+                command.Parameters.AddWithValue("@written", question.IsWritten);
+                command.Parameters.AddWithValue("@class", question.KnowledgeClass);
 
-                    // ExecuteScalar vrací ID právě vloženého záznamu
-                    long insertedId = (long)command.ExecuteScalar();
-                    question.Id = (int)insertedId;
-                }
+                long insertedId = (long)command.ExecuteScalar();
+                question.Id = (int)insertedId;
             }
         }
 
