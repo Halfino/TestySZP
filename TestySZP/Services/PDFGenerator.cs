@@ -20,6 +20,8 @@ namespace TestySZP.Services
             // Úvod
             document.Add(new Paragraph($"Test pro: {person.Name}", titleFont));
             document.Add(new Paragraph($"Třída znalostí: {person.KnowledgeClass}", normalFont));
+            document.Add(new Paragraph($"Datum:"));
+            document.Add(new Paragraph($"Podpis:"));
             document.Add(new Paragraph("\n"));
 
             int questionNumber = 1;

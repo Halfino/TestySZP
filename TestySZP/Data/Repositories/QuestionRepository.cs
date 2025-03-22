@@ -113,8 +113,33 @@ namespace TestySZP.Data.Repositories
                     }
                 }
             }
+            foreach (var question in result)
+            {
+                using (var connection = DatabaseHelper.GetConnection())
+                {
+                    connection.Open();
+                    using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
+                    {
+                        command.Parameters.AddWithValue("@id", question.Id);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                question.Answers.Add(new Answer
+                                {
+                                    Id = reader.GetInt32(0),
+                                    QuestionId = reader.GetInt32(1),
+                                    Text = reader.GetString(2),
+                                    IsCorrect = reader.GetBoolean(3)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
 
-            return result;
+
+                return result;
         }
 
         public static List<Question> GetRemainingQuestionsForTest(int classLevel, int count)
@@ -143,6 +168,30 @@ namespace TestySZP.Data.Repositories
                                 IsWritten = reader.GetBoolean(2),
                                 KnowledgeClass = reader.GetInt32(3)
                             });
+                        }
+                    }
+                }
+            }
+            foreach (var question in result)
+            {
+                using (var connection = DatabaseHelper.GetConnection())
+                {
+                    connection.Open();
+                    using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
+                    {
+                        command.Parameters.AddWithValue("@id", question.Id);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                question.Answers.Add(new Answer
+                                {
+                                    Id = reader.GetInt32(0),
+                                    QuestionId = reader.GetInt32(1),
+                                    Text = reader.GetString(2),
+                                    IsCorrect = reader.GetBoolean(3)
+                                });
+                            }
                         }
                     }
                 }
@@ -177,6 +226,31 @@ namespace TestySZP.Data.Repositories
                                 IsWritten = reader.GetBoolean(2),
                                 KnowledgeClass = reader.GetInt32(3)
                             });
+                        }
+                    }
+                }
+            }
+
+            foreach (var question in result)
+            {
+                using (var connection = DatabaseHelper.GetConnection())
+                {
+                    connection.Open();
+                    using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
+                    {
+                        command.Parameters.AddWithValue("@id", question.Id);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                question.Answers.Add(new Answer
+                                {
+                                    Id = reader.GetInt32(0),
+                                    QuestionId = reader.GetInt32(1),
+                                    Text = reader.GetString(2),
+                                    IsCorrect = reader.GetBoolean(3)
+                                });
+                            }
                         }
                     }
                 }

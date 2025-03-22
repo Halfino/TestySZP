@@ -9,7 +9,8 @@
                   DisplayMemberPath="Name" Width="250" Margin="0,5,0,15"/>
 
         <TextBlock Text="Počet otázek:"/>
-        <TextBox Text="{Binding QuestionCount}" Width="100" Margin="0,5,0,15"/>
+        <TextBox Text="{Binding QuestionCount, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,5,0,15"/>
+
 
         <Button Content="Generovat test" Width="150" HorizontalAlignment="Left"
                 Command="{Binding GenerateTestCommand}" IsEnabled="{Binding CanGenerate}"/>

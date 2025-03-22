@@ -65,6 +65,8 @@ namespace TestySZP.ViewModels
         {
             bool valid = SelectedPerson != null && int.TryParse(QuestionCount, out int n) && n > 0;
             CanGenerate = valid;
+
+            ((RelayCommand)GenerateTestCommand).RaiseCanExecuteChanged();
         }
 
         private void GenerateTest()

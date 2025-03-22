@@ -6,7 +6,6 @@ namespace TestySZP.Models
     public class Question : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
         private int _id;
         public int Id
         {
