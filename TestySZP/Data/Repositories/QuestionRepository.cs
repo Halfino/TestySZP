@@ -14,7 +14,7 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("SELECT * FROM Questions", connection))
                 using (var reader = command.ExecuteReader())
                 {
@@ -33,7 +33,7 @@ namespace TestySZP.Data.Repositories
                         // načtení odpovědí
                         using (var ansConn = DatabaseHelper.GetConnection())
                         {
-                            ansConn.Open();
+
                             using (var ansCmd = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", ansConn))
                             {
                                 ansCmd.Parameters.AddWithValue("@id", question.Id);
@@ -67,7 +67,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand(connection))
                 {
                     command.CommandText = @"
@@ -85,7 +85,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand(connection))
                 {
                     command.CommandText = @"
@@ -107,7 +107,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("DELETE FROM Questions WHERE id = @id", connection))
                 {
                     command.Parameters.AddWithValue("@id", questionId);
@@ -122,7 +122,7 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+ 
                 using (var command = new SQLiteCommand("SELECT * FROM Questions WHERE knowledge_class = @class", connection))
                 {
                     command.Parameters.AddWithValue("@class", classLevel);
@@ -145,7 +145,7 @@ namespace TestySZP.Data.Repositories
             {
                 using (var connection = DatabaseHelper.GetConnection())
                 {
-                    connection.Open();
+  
                     using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
                     {
                         command.Parameters.AddWithValue("@id", question.Id);
@@ -176,7 +176,6 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
                 using (var command = new SQLiteCommand(@"
                     SELECT * FROM Questions 
                     WHERE knowledge_class < @class
@@ -204,7 +203,6 @@ namespace TestySZP.Data.Repositories
             {
                 using (var connection = DatabaseHelper.GetConnection())
                 {
-                    connection.Open();
                     using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
                     {
                         command.Parameters.AddWithValue("@id", question.Id);
@@ -234,7 +232,6 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
                 using (var command = new SQLiteCommand(@"
                     SELECT * FROM Questions
                     WHERE knowledge_class <= @class
@@ -263,7 +260,6 @@ namespace TestySZP.Data.Repositories
             {
                 using (var connection = DatabaseHelper.GetConnection())
                 {
-                    connection.Open();
                     using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
                     {
                         command.Parameters.AddWithValue("@id", question.Id);
@@ -290,7 +286,6 @@ namespace TestySZP.Data.Repositories
         public static Question GetQuestionById(int id)
         {
             using var connection = DatabaseHelper.GetConnection();
-            connection.Open();
             using var command = new SQLiteCommand("SELECT * FROM Questions WHERE id = @id", connection);
             command.Parameters.AddWithValue("@id", id);
             using var reader = command.ExecuteReader();
@@ -316,7 +311,6 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
                 using (var command = new SQLiteCommand(@"
             SELECT * FROM Questions 
             WHERE knowledge_class < @class", connection))
@@ -343,7 +337,6 @@ namespace TestySZP.Data.Repositories
             {
                 using (var connection = DatabaseHelper.GetConnection())
                 {
-                    connection.Open();
                     using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @id", connection))
                     {
                         command.Parameters.AddWithValue("@id", question.Id);
@@ -371,7 +364,6 @@ namespace TestySZP.Data.Repositories
         private static int GetAnswerCount(int questionId)
         {
             using var connection = DatabaseHelper.GetConnection();
-            connection.Open();
             using var command = new SQLiteCommand("SELECT COUNT(*) FROM Answers WHERE question_id = @id", connection);
             command.Parameters.AddWithValue("@id", questionId);
             return Convert.ToInt32(command.ExecuteScalar());

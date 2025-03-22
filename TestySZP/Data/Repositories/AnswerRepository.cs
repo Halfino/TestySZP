@@ -13,7 +13,7 @@ namespace TestySZP.Data.Repositories
 
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("SELECT * FROM Answers WHERE question_id = @qid", connection))
                 {
                     command.Parameters.AddWithValue("@qid", questionId);
@@ -40,7 +40,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("INSERT INTO Answers (question_id, text, is_correct) VALUES (@qid, @text, @correct)", connection))
                 {
                     command.Parameters.AddWithValue("@qid", answer.QuestionId);
@@ -55,7 +55,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("UPDATE Answers SET text = @text, is_correct = @correct WHERE id = @id", connection))
                 {
                     command.Parameters.AddWithValue("@text", answer.Text);
@@ -70,7 +70,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 using (var command = new SQLiteCommand("DELETE FROM Answers WHERE id = @id", connection))
                 {
                     command.Parameters.AddWithValue("@id", id);

@@ -13,7 +13,7 @@ namespace TestySZP.Data.Repositories
             var people = new List<Person>();
 
             using var connection = DatabaseHelper.GetConnection();
-            connection.Open();
+
 
             using var command = new SQLiteCommand("SELECT * FROM Persons", connection);
             using var reader = command.ExecuteReader();
@@ -36,7 +36,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 string query = "INSERT INTO Persons (name, knowledge_class, valid_until) VALUES (@name, @knowledge_class, @valid_until)";
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
@@ -54,7 +54,7 @@ namespace TestySZP.Data.Repositories
             List<Person> persons = new List<Person>();
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 string query = "SELECT * FROM Persons";
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
@@ -81,7 +81,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 string query = "UPDATE Persons SET name = @name, knowledge_class = @knowledge_class, valid_until = @valid_until WHERE id = @id";
                 using (var cmd = new SQLiteCommand(query, connection))
                 {
@@ -99,7 +99,7 @@ namespace TestySZP.Data.Repositories
         {
             using (var connection = DatabaseHelper.GetConnection())
             {
-                connection.Open();
+
                 string query = "DELETE FROM Persons WHERE id = @id";
                 using (var cmd = new SQLiteCommand(query, connection))
                 {

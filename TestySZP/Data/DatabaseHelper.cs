@@ -11,7 +11,16 @@ namespace TestySZP.Data
 
         public static SQLiteConnection GetConnection()
         {
-            return new SQLiteConnection(ConnectionString);
+            var connection = new SQLiteConnection(ConnectionString);
+            connection.Open();
+
+            // Aktivuj podporu cizích klíčů (včetně ON DELETE CASCADE)
+            using (var command = new SQLiteCommand("PRAGMA foreign_keys = ON;", connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            return connection;
         }
 
         public static void InitializeDatabase()
