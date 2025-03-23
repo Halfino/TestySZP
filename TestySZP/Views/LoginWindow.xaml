@@ -4,7 +4,7 @@
         Title="Přihlášení" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <StackPanel Margin="20">
         <TextBlock Text="Zadejte heslo:" Margin="0,0,0,5"/>
-        <PasswordBox Name="PasswordBox" Margin="0,0,0,10"/>
+        <PasswordBox Name="PasswordBox" KeyDown="PasswordBox_KeyDown" Margin="0,0,0,10"/>
         <Button Content="Přihlásit" Click="Login_Click" Width="80" HorizontalAlignment="Right"/>
     </StackPanel>
 </Window>

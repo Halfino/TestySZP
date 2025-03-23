@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace TestySZP.Views
 {
@@ -38,6 +39,14 @@ namespace TestySZP.Views
             }
 
             base.OnClosed(e);
+        }
+
+        private void PasswordBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Login_Click(sender, e);
+            }
         }
     }
 }
