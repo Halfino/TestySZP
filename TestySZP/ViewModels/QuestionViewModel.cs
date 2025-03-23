@@ -107,16 +107,17 @@ namespace TestySZP.ViewModels
 
         private void OpenAnswerWindow()
         {
+            if (SelectedQuestion == null)
+                return;
+
             var window = new AnswerWindow(SelectedQuestion);
             window.ShowDialog();
 
-            // Aktualizace otázky po zavření okna
+            // Znovunačtení dané otázky po editaci odpovědí
             var updated = QuestionRepository.GetQuestionById(SelectedQuestion.Id);
             if (updated != null)
             {
-                var index = Questions.IndexOf(SelectedQuestion);
-                Questions[index] = updated;
-                SelectedQuestion = updated;
+                ReplaceQuestionInList(updated);
             }
         }
 
@@ -148,6 +149,17 @@ namespace TestySZP.ViewModels
                 KnowledgeClass = 3,
                 Answers = new ObservableCollection<Answer>()
             };
+        }
+
+        private void ReplaceQuestionInList(Question updated)
+        {
+            int index = Questions.IndexOf(SelectedQuestion);
+            if (index >= 0)
+            {
+                Questions.RemoveAt(index);
+                Questions.Insert(index, updated);
+                SelectedQuestion = updated;
+            }
         }
 
         private void OnPropertyChanged(string propertyName) =>
