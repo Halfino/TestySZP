@@ -1,0 +1,10 @@
+﻿<Window x:Class="TestySZP.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Přihlášení" Height="150" Width="300" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <StackPanel Margin="20">
+        <TextBlock Text="Zadejte heslo:" Margin="0,0,0,5"/>
+        <PasswordBox Name="PasswordBox" Margin="0,0,0,10"/>
+        <Button Content="Přihlásit" Click="Login_Click" Width="80" HorizontalAlignment="Right"/>
+    </StackPanel>
+</Window>
