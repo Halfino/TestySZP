@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using TestySZP.Data.Repositories;
 using TestySZP.Helpers;
@@ -16,6 +17,7 @@ namespace TestySZP.ViewModels
         public Question Question { get; }
         public ICommand AddAnswerCommand { get; }
         public ICommand DeleteAnswerCommand { get; }
+        public ICommand SaveAnswerCommand { get; }
 
         private Answer _newAnswer;
         public Answer NewAnswer
@@ -47,6 +49,8 @@ namespace TestySZP.ViewModels
                 // >>> ZAJISTÍ ODEMČENÍ TLAČÍTKA
                 if (DeleteAnswerCommand is RelayCommand deleteCmd)
                     deleteCmd.RaiseCanExecuteChanged();
+
+                (SaveAnswerCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 
@@ -59,6 +63,7 @@ namespace TestySZP.ViewModels
 
             AddAnswerCommand = new RelayCommand(param => AddAnswer());
             DeleteAnswerCommand = new RelayCommand(param => DeleteAnswer(), param => SelectedAnswer != null);
+            SaveAnswerCommand = new RelayCommand(param => SaveAnswer(), param => SelectedAnswer != null);
 
             ResetNewAnswer();
         }
@@ -85,6 +90,7 @@ namespace TestySZP.ViewModels
         {
             if (sender is Answer answer)
             {
+                Debug.WriteLine($"Ukládám do DB: {answer.Text}");
                 AnswerRepository.UpdateAnswer(answer);
             }
         }
@@ -96,6 +102,15 @@ namespace TestySZP.ViewModels
                 Text = "",
                 IsCorrect = false
             };
+        }
+
+
+        private void SaveAnswer()
+        {
+            if (SelectedAnswer != null)
+            {
+                AnswerRepository.UpdateAnswer(SelectedAnswer);
+            }
         }
 
         private void OnPropertyChanged(string name) =>

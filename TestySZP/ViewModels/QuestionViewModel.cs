@@ -16,6 +16,7 @@ namespace TestySZP.ViewModels
 
         public ObservableCollection<Question> Questions { get; set; }
         public ObservableCollection<int> KnowledgeLevels { get; set; }
+        public ICommand SaveQuestionCommand { get; }
 
         private Question _newQuestion;
         public Question NewQuestion
@@ -35,19 +36,15 @@ namespace TestySZP.ViewModels
             get => _selectedQuestion;
             set
             {
-                if (_selectedQuestion != null)
-                    _selectedQuestion.PropertyChanged -= SelectedQuestion_PropertyChanged;
-
                 _selectedQuestion = value;
                 OnPropertyChanged(nameof(SelectedQuestion));
                 OnPropertyChanged(nameof(IsQuestionSelected));
                 OnPropertyChanged(nameof(IsWritten));
 
-                if (_selectedQuestion != null)
-                    _selectedQuestion.PropertyChanged += SelectedQuestion_PropertyChanged;
-
-                ((RelayCommand)DeleteQuestionCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)OpenAnswerWindowCommand).RaiseCanExecuteChanged();
+                // Aktivace příkazů
+                (SaveQuestionCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                (DeleteQuestionCommand as RelayCommand)?.RaiseCanExecuteChanged();
+                (OpenAnswerWindowCommand as RelayCommand)?.RaiseCanExecuteChanged();
             }
         }
 
@@ -83,6 +80,7 @@ namespace TestySZP.ViewModels
             AddQuestionCommand = new RelayCommand(param => AddQuestion());
             DeleteQuestionCommand = new RelayCommand(param => DeleteQuestion(), param => SelectedQuestion != null);
             OpenAnswerWindowCommand = new RelayCommand(param => OpenAnswerWindow(), param => SelectedQuestion != null);
+            SaveQuestionCommand = new RelayCommand(param => SaveSelectedQuestion(), param => SelectedQuestion != null);
 
             ResetNewQuestion();
         }
@@ -159,6 +157,14 @@ namespace TestySZP.ViewModels
                 Questions.RemoveAt(index);
                 Questions.Insert(index, updated);
                 SelectedQuestion = updated;
+            }
+        }
+
+        private void SaveSelectedQuestion()
+        {
+            if (SelectedQuestion != null)
+            {
+                QuestionRepository.UpdateQuestion(SelectedQuestion);
             }
         }
 
