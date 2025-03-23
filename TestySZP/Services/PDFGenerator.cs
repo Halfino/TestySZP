@@ -23,7 +23,7 @@ namespace TestySZP.Services
             // Úvod
             document.Add(new Paragraph($"Kontrolní test SZP", titleFont) { Alignment = Element.ALIGN_CENTER });
             document.Add(new Paragraph("\n"));
-            document.Add(new Paragraph($"Jméno a příjmení: {person.Name}", normalFont));
+            document.Add(new Paragraph($"Hodnost, jméno, příjmení: {person.Name}", normalFont));
             document.Add(new Paragraph($"Dosažená třída: {person.KnowledgeClass}", normalFont));
             document.Add(new Paragraph($"Datum:"));
             document.Add(new Paragraph("Hodnocení:"));
