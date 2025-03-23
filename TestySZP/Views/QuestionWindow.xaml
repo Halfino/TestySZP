@@ -58,7 +58,8 @@
                       Visibility="{Binding IsQuestionSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                 <StackPanel Margin="10">
                     <TextBlock Text="Text otázky:"/>
-                    <TextBox Text="{Binding SelectedQuestion.Text, UpdateSourceTrigger=PropertyChanged}" Width="600"/>
+                    <TextBox Text="{Binding SelectedQuestion.Text, UpdateSourceTrigger=PropertyChanged}" Width="600" />
+
 
                     <TextBlock Text="Třída znalostí:" Margin="0,10,0,0"/>
                     <ComboBox ItemsSource="{Binding KnowledgeLevels}"
@@ -68,6 +69,8 @@
                               IsChecked="{Binding SelectedQuestion.IsWritten, Mode=TwoWay}" Margin="0,10,0,0"/>
 
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="Uložit změny"
+                                Command="{Binding SaveQuestionCommand}" Width="120"/>
                         <Button Content="Smazat otázku"
                                 Command="{Binding DeleteQuestionCommand}" Width="120" Margin="10,0,0,0"/>
                         <Button Content="Správa odpovědí"

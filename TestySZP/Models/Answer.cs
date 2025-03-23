@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 
 namespace TestySZP.Models
 {
@@ -24,7 +25,7 @@ namespace TestySZP.Models
         public string Text
         {
             get => _text;
-            set { _text = value; OnPropertyChanged(nameof(Text)); }
+            set { _text = value; Debug.WriteLine($"Text changed: {_text}"); OnPropertyChanged(nameof(Text)); }
         }
 
         private bool _isCorrect;
