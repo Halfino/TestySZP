@@ -38,8 +38,6 @@ namespace TestySZP.Data
 
                 using (var connection = GetConnection())
                 {
-                    connection.Open();
-
                     string createQuestionsTable = @"
                     CREATE TABLE IF NOT EXISTS Questions (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,

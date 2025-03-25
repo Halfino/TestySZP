@@ -7,8 +7,8 @@ namespace TestySZP
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            
             var loginWindow = new LoginWindow();
-
             // Ukážeme jako dialog
             bool? result = loginWindow.ShowDialog();
 
