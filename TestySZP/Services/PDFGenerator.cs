@@ -25,10 +25,10 @@ namespace TestySZP.Services
             document.Add(new Paragraph("\n"));
             document.Add(new Paragraph($"Hodnost, jméno, příjmení: {person.Name}", normalFont));
             document.Add(new Paragraph($"Dosažená třída: {person.KnowledgeClass}", normalFont));
-            document.Add(new Paragraph($"Datum:"));
-            document.Add(new Paragraph("Hodnocení:"));
-            document.Add(new Paragraph("Instruktor / Inspektor:"));
-            document.Add(new Paragraph($"Podpis / souhlasím s výsledkem:                                     ANO / NE"));
+            document.Add(new Paragraph($"Datum:", normalFont));
+            document.Add(new Paragraph("Hodnocení:", normalFont));
+            document.Add(new Paragraph("Instruktor / Inspektor:", normalFont));
+            document.Add(new Paragraph($"Podpis / souhlasím s výsledkem:                                     ANO / NE", normalFont));
             document.Add(new Paragraph("\n"));
 
             int questionNumber = 0;
