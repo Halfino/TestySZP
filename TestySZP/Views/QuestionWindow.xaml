@@ -30,6 +30,8 @@
                 </StackPanel>
             </GroupBox>
 
+            <TextBlock Text="Vyhledávání:" Margin="0,10,0,2"/>
+            <TextBox Width="200" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
             <!-- SEZNAM OTÁZEK -->
             <GroupBox Header="Seznam otázek" Margin="0,0,0,10">
                 <ListView ItemsSource="{Binding Questions}"
@@ -38,7 +40,9 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Text otázky" DisplayMemberBinding="{Binding Text}" Width="350"/>
-                            <GridViewColumn Header="Třída" DisplayMemberBinding="{Binding KnowledgeClass}" Width="50"/>
+                            <GridViewColumn DisplayMemberBinding="{Binding KnowledgeClass}" Width="50">
+                                <GridViewColumnHeader Click="SortByClass_Click" Content="Třída"/>
+                            </GridViewColumn>
                             <GridViewColumn Header="Psaná odpověď" Width="120">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>

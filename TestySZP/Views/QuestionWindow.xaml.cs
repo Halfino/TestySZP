@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.Windows;
+using TestySZP.Models;
 using TestySZP.ViewModels;
 
 namespace TestySZP.Views
@@ -17,6 +19,14 @@ namespace TestySZP.Views
         private void CloseWindow(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private bool _sortAscending = true;
+
+        private void SortByClass_Click(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as QuestionViewModel;
+            viewModel?.SortQuestionsByClass();
         }
     }
 }
