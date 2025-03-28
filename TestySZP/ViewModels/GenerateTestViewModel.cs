@@ -7,6 +7,7 @@ using TestySZP.Models;
 using TestySZP.Services;
 using TestySZP.Helpers;
 using Microsoft.Win32;
+using System.IO;
 
 namespace TestySZP.ViewModels
 {
@@ -76,16 +77,20 @@ namespace TestySZP.ViewModels
 
             var questions = _testService.GenerateTestForPerson(SelectedPerson, count);
 
-            SaveFileDialog dlg = new SaveFileDialog
-            {
-                Filter = "PDF dokument|*.pdf",
-                FileName = $"Test_{SelectedPerson.Name.Replace(" ", "_")}.pdf"
-            };
+            // 📁 Složka Tests/
+            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tests");
+            string monthDir = DateTime.Now.ToString("MM-yyyy");
+            string testsDir = Path.Combine(baseDir, monthDir);
+            if (!Directory.Exists(testsDir))
+                Directory.CreateDirectory(testsDir);
 
-            if (dlg.ShowDialog() == true)
-            {
-                PDFGenerator.GenerateTestPDF(SelectedPerson, questions, dlg.FileName);
-            }
+            // 📄 Název souboru
+            string safeName = SelectedPerson.Name.Replace(" ", "_");
+            string fileName = $"Test_{safeName}_{DateTime.Now:dd.MM.yyyy}.pdf";
+            string fullPath = Path.Combine(testsDir, fileName);
+
+            // 📤 Generuj PDF
+            PDFGenerator.GenerateTestPDF(SelectedPerson, questions, fullPath);
         }
 
         private void OnPropertyChanged(string name) =>

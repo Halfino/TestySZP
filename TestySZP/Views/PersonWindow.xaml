@@ -38,6 +38,7 @@
                 <Button Content="Přidat" Command="{Binding AddPersonCommand}" Width="100" Margin="5"/>
                 <Button Content="Upravit" Command="{Binding UpdatePersonCommand}" Width="100" Margin="5"/>
                 <Button Content="Smazat" Command="{Binding DeletePersonCommand}" Width="100" Margin="5"/>
+                <Button Content="Historie testů" Width="120" Margin="5" Click="OpenTestHistory_Click" IsEnabled="{Binding IsPersonSelected}"/>
                 <Button Content="Zavřít" Width="100" Margin="5" Click="CloseWindow"/>
             </StackPanel>
         </StackPanel>

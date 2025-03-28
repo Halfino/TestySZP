@@ -1,0 +1,44 @@
+﻿<Window x:Class="TestySZP.Views.TestHistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TestySZP.ViewModels"
+        Title="Historie testů" Height="500" Width="750"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{Binding PersonName}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+
+        <ListView Grid.Row="1" ItemsSource="{Binding TestResults}" SelectedItem="{Binding SelectedTestResult, Mode=TwoWay}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Vygenerováno">
+                        <GridViewColumn.DisplayMemberBinding>
+                            <Binding Path="DateGenerated" StringFormat='dd.MM.yyyy' />
+                        </GridViewColumn.DisplayMemberBinding>
+                    </GridViewColumn>
+
+                    <GridViewColumn Header="Vyplněno">
+                        <GridViewColumn.DisplayMemberBinding>
+                            <Binding Path="DateCompleted" StringFormat='dd.MM.yyyy' />
+                        </GridViewColumn.DisplayMemberBinding>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Počet správně" DisplayMemberBinding="{Binding Score}" Width="100"/>
+                    <GridViewColumn Header="Z celkem" DisplayMemberBinding="{Binding MaxScore}" Width="80"/>
+                    <GridViewColumn Header="Poznámka" DisplayMemberBinding="{Binding Note}" Width="250"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Right">
+            <Button Content="Otevřít PDF" Width="100" Margin="0,0,10,0" Command="{Binding OpenPdfCommand}" />
+            <Button Content="Upravit výsledek" Width="120" Margin="0,0,10,0" Command="{Binding EditResultCommand}" />
+            <Button Content="Smazat test" Width="100" Command="{Binding DeleteTestCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>
