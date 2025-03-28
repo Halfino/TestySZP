@@ -8,6 +8,7 @@ using TestySZP.Services;
 using TestySZP.Helpers;
 using Microsoft.Win32;
 using System.IO;
+using System.Windows;
 
 namespace TestySZP.ViewModels
 {
@@ -55,11 +56,13 @@ namespace TestySZP.ViewModels
         }
 
         public ICommand GenerateTestCommand { get; }
+        public ICommand GenerateForAllCommand { get; }
 
         public GenerateTestViewModel()
         {
             People = new ObservableCollection<Person>(PersonRepository.GetAll());
             GenerateTestCommand = new RelayCommand(param => GenerateTest(), param => CanGenerate);
+            GenerateForAllCommand = new RelayCommand(_ => GenerateForAll());
         }
 
         private void UpdateCanGenerate()
@@ -91,6 +94,38 @@ namespace TestySZP.ViewModels
 
             // 📤 Generuj PDF
             PDFGenerator.GenerateTestPDF(SelectedPerson, questions, fullPath);
+        }
+
+        private void GenerateForAll()
+        {
+            if (!int.TryParse(QuestionCount, out int count) || People.Count == 0)
+                return;
+
+            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tests");
+            string monthDir = DateTime.Now.ToString("MM-yyyy");
+            string testsDir = Path.Combine(baseDir, monthDir);
+
+            if (!Directory.Exists(testsDir))
+                Directory.CreateDirectory(testsDir);
+
+            foreach (var person in People)
+            {
+                var questions = _testService.GenerateTestForPerson(person, count);
+
+                string safeName = person.Name.Replace(" ", "_");
+                string fileName = $"Test_{safeName}_{DateTime.Now:dd.MM.yyyy}.pdf";
+                string fullPath = Path.Combine(testsDir, fileName);
+
+                PDFGenerator.GenerateTestPDF(person, questions, fullPath);
+            }
+
+            MessageBox.Show("Testy pro všechny osoby byly úspěšně vygenerovány.", "Hotovo", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            // Zavři okno po dokončení
+            Application.Current.Windows
+                .OfType<Window>()
+                .FirstOrDefault(w => w is Views.GenerateTestWindow)
+                ?.Close();
         }
 
         private void OnPropertyChanged(string name) =>
