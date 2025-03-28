@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -14,8 +15,36 @@ namespace TestySZP.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableCollection<Question> Questions { get; set; }
+        private ObservableCollection<Question> _questions = new();
+        public ObservableCollection<Question> Questions
+        {
+            get => _questions;
+            set
+            {
+                _questions = value;
+                OnPropertyChanged(nameof(Questions));
+            }
+        }
+
         public ObservableCollection<int> KnowledgeLevels { get; set; }
+
+        public ObservableCollection<Question> AllQuestions { get; set; } = new();
+
+        private string _searchText;
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                _searchText = value;
+                OnPropertyChanged(nameof(SearchText));
+                FilterQuestions();
+            }
+        }
+
+        public ICommand AddQuestionCommand { get; }
+        public ICommand DeleteQuestionCommand { get; }
+        public ICommand OpenAnswerWindowCommand { get; }
         public ICommand SaveQuestionCommand { get; }
 
         private Question _newQuestion;
@@ -41,7 +70,6 @@ namespace TestySZP.ViewModels
                 OnPropertyChanged(nameof(IsQuestionSelected));
                 OnPropertyChanged(nameof(IsWritten));
 
-                // Aktivace příkazů
                 (SaveQuestionCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 (DeleteQuestionCommand as RelayCommand)?.RaiseCanExecuteChanged();
                 (OpenAnswerWindowCommand as RelayCommand)?.RaiseCanExecuteChanged();
@@ -68,14 +96,12 @@ namespace TestySZP.ViewModels
             }
         }
 
-        public ICommand AddQuestionCommand { get; }
-        public ICommand DeleteQuestionCommand { get; }
-        public ICommand OpenAnswerWindowCommand { get; }
-
         public QuestionViewModel()
         {
-            Questions = new ObservableCollection<Question>(QuestionRepository.GetAllQuestions());
             KnowledgeLevels = new ObservableCollection<int> { 1, 2, 3 };
+
+            AllQuestions = new ObservableCollection<Question>(QuestionRepository.GetAllQuestions());
+            Questions = new ObservableCollection<Question>(AllQuestions);
 
             AddQuestionCommand = new RelayCommand(param => AddQuestion());
             DeleteQuestionCommand = new RelayCommand(param => DeleteQuestion(), param => SelectedQuestion != null);
@@ -88,7 +114,8 @@ namespace TestySZP.ViewModels
         private void AddQuestion()
         {
             QuestionRepository.AddQuestion(NewQuestion);
-            Questions.Add(NewQuestion);
+            AllQuestions.Add(NewQuestion);
+            FilterQuestions();
             ResetNewQuestion();
         }
 
@@ -97,7 +124,8 @@ namespace TestySZP.ViewModels
             if (SelectedQuestion != null)
             {
                 QuestionRepository.DeleteQuestion(SelectedQuestion.Id);
-                Questions.Remove(SelectedQuestion);
+                AllQuestions.Remove(SelectedQuestion);
+                FilterQuestions();
                 SelectedQuestion = null;
                 OnPropertyChanged(nameof(IsWritten));
             }
@@ -111,31 +139,28 @@ namespace TestySZP.ViewModels
             var window = new AnswerWindow(SelectedQuestion);
             window.ShowDialog();
 
-            // Znovunačtení dané otázky po editaci odpovědí
             var updated = QuestionRepository.GetQuestionById(SelectedQuestion.Id);
             if (updated != null)
-            {
                 ReplaceQuestionInList(updated);
-            }
         }
 
-        private void SelectedQuestion_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void ReplaceQuestionInList(Question updated)
+        {
+            int index = AllQuestions.IndexOf(AllQuestions.First(q => q.Id == updated.Id));
+            if (index >= 0)
+                AllQuestions[index] = updated;
+
+            FilterQuestions();
+            SelectedQuestion = Questions.FirstOrDefault(q => q.Id == updated.Id);
+        }
+
+        private void SaveSelectedQuestion()
         {
             if (SelectedQuestion != null)
             {
                 QuestionRepository.UpdateQuestion(SelectedQuestion);
-                RefreshQuestionList(SelectedQuestion.Id);
+                ReplaceQuestionInList(SelectedQuestion);
             }
-        }
-
-        private void RefreshQuestionList(int idToRestore)
-        {
-            var allQuestions = QuestionRepository.GetAllQuestions();
-            Questions.Clear();
-            foreach (var q in allQuestions)
-                Questions.Add(q);
-
-            SelectedQuestion = Questions.FirstOrDefault(q => q.Id == idToRestore);
         }
 
         private void ResetNewQuestion()
@@ -149,23 +174,26 @@ namespace TestySZP.ViewModels
             };
         }
 
-        private void ReplaceQuestionInList(Question updated)
+        private void FilterQuestions()
         {
-            int index = Questions.IndexOf(SelectedQuestion);
-            if (index >= 0)
-            {
-                Questions.RemoveAt(index);
-                Questions.Insert(index, updated);
-                SelectedQuestion = updated;
-            }
+            var filtered = string.IsNullOrWhiteSpace(SearchText)
+                ? AllQuestions
+                : new ObservableCollection<Question>(
+                    AllQuestions.Where(q => q.Text.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
+
+            Questions = new ObservableCollection<Question>(filtered);
         }
 
-        private void SaveSelectedQuestion()
+        private bool _sortAscending = true;
+
+        public void SortQuestionsByClass()
         {
-            if (SelectedQuestion != null)
-            {
-                QuestionRepository.UpdateQuestion(SelectedQuestion);
-            }
+            var sorted = _sortAscending
+                ? Questions.OrderBy(q => q.KnowledgeClass)
+                : Questions.OrderByDescending(q => q.KnowledgeClass);
+
+            Questions = new ObservableCollection<Question>(sorted);
+            _sortAscending = !_sortAscending;
         }
 
         private void OnPropertyChanged(string propertyName) =>
