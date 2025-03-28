@@ -16,5 +16,14 @@ namespace TestySZP.Views
             this.Close();
         }
 
+        private void OpenTestHistory_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is PersonViewModel viewModel && viewModel.SelectedPerson != null)
+            {
+                var historyWindow = new TestHistoryWindow(viewModel.SelectedPerson);
+                historyWindow.ShowDialog();
+            }
+        }
+
     }
 }
