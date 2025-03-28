@@ -14,6 +14,12 @@ namespace TestySZP.Views
         {
             InitializeComponent();
             DataContext = new MainViewModel(); // ✅ Nastavení DataContext
+#if DEBUG
+        this.Title = "Testy SZP [DEBUG]";
+#else
+            var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            this.Title = $"Testy SZP v{version}";
+#endif
         }
 
         // Otevře správu osob jako nové okno
