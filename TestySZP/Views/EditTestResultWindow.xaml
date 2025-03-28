@@ -1,7 +1,8 @@
 ﻿<Window x:Class="TestySZP.Views.EditTestResultWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Úprava výsledku testu" Height="250" Width="400"
+        Title="Úprava výsledku testu" Height="300" Width="400"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
     <StackPanel Margin="20">
 

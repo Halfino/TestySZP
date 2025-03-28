@@ -13,32 +13,85 @@
         </Grid.RowDefinitions>
 
         <TextBlock Text="{Binding PersonName}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-
-        <ListView Grid.Row="1" ItemsSource="{Binding TestResults}" SelectedItem="{Binding SelectedTestResult, Mode=TwoWay}">
+        <ListView Grid.Row="1"
+          ItemsSource="{Binding TestResults}" 
+          SelectedItem="{Binding SelectedTestResult, Mode=TwoWay}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Vygenerováno">
-                        <GridViewColumn.DisplayMemberBinding>
-                            <Binding Path="DateGenerated" StringFormat='dd.MM.yyyy' />
-                        </GridViewColumn.DisplayMemberBinding>
+                    <!-- Vygenerováno -->
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader FontWeight="Bold" Content="Vygenerováno" HorizontalContentAlignment="Center"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DateGenerated, StringFormat='dd.MM.yyyy'}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Vyplněno">
-                        <GridViewColumn.DisplayMemberBinding>
-                            <Binding Path="DateCompleted" StringFormat='dd.MM.yyyy' />
-                        </GridViewColumn.DisplayMemberBinding>
+                    <!-- Vyplněno -->
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader FontWeight="Bold" Content="Vyplněno" HorizontalContentAlignment="Center"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DateCompleted, StringFormat='dd.MM.yyyy'}"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Počet správně" DisplayMemberBinding="{Binding Score}" Width="100"/>
-                    <GridViewColumn Header="Z celkem" DisplayMemberBinding="{Binding MaxScore}" Width="80"/>
-                    <GridViewColumn Header="Poznámka" DisplayMemberBinding="{Binding Note}" Width="250"/>
+
+                    <!-- Skóre -->
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader FontWeight="Bold" Content="Skóre" HorizontalContentAlignment="Center"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} / {1}">
+                                            <Binding Path="Score"/>
+                                            <Binding Path="MaxScore"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
+                    <!-- Poznámka -->
+                    <GridViewColumn Width="250">
+                        <GridViewColumn.Header>
+                            <GridViewColumnHeader FontWeight="Bold" Content="Poznámka" HorizontalContentAlignment="Center"/>
+                        </GridViewColumn.Header>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Note}"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
 
+
         <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0" HorizontalAlignment="Right">
-            <Button Content="Otevřít PDF" Width="100" Margin="0,0,10,0" Command="{Binding OpenPdfCommand}" />
-            <Button Content="Upravit výsledek" Width="120" Margin="0,0,10,0" Command="{Binding EditResultCommand}" />
-            <Button Content="Smazat test" Width="100" Command="{Binding DeleteTestCommand}" />
+            <Button Content="Otevřít PDF" Width="100" Margin="0,10,10,0" Command="{Binding OpenPdfCommand}" />
+            <Button Content="Upravit výsledek" Width="120" Margin="0,10,10,0" Command="{Binding EditResultCommand}" />
+            <Button Content="Smazat test" Width="100" Margin="0,10,10,0" Command="{Binding DeleteTestCommand}" />
+            <Button Content="Zavřít" Width="100" Margin="0,10,0,0" Click="CloseWindow_Click"/>
         </StackPanel>
     </Grid>
 </Window>

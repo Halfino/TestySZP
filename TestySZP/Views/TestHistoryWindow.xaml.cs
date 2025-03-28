@@ -11,5 +11,10 @@ namespace TestySZP.Views
             InitializeComponent();
             DataContext = new TestHistoryViewModel(person);
         }
+
+        private void CloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

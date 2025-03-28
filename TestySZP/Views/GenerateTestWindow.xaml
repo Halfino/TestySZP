@@ -1,7 +1,8 @@
 ﻿<Window x:Class="TestySZP.Views.GenerateTestWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Generování testu" Height="250" Width="400">
+        Title="Generování testu" Height="250" Width="400"
+        ResizeMode="NoResize">
     <StackPanel Margin="20" VerticalAlignment="Center">
         <TextBlock Text="Vyberte osobu:"/>
         <ComboBox ItemsSource="{Binding People}"

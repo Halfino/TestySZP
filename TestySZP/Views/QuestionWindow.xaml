@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:TestySZP.Helpers"
-        Title="Správa otázek" Height="700" Width="750">
+        Title="Správa otázek" Height="750" Width="750"
+        ResizeMode="NoResize">
 
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
