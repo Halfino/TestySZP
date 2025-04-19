@@ -92,7 +92,8 @@ namespace TestySZP.ViewModels
             var questions = _testService.GenerateTestForPerson(SelectedPerson, count);
 
             // 📁 Složka Tests/
-            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tests");
+            string exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string baseDir = Path.Combine(exeDir, "Tests");
             string monthDir = DateTime.Now.ToString("MM-yyyy");
             string testsDir = Path.Combine(baseDir, monthDir);
             if (!Directory.Exists(testsDir))
