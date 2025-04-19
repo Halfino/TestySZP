@@ -1,4 +1,4 @@
-name: Windows Release
+name: Windows Release (.NET framework-dependent)
 
 on:
   release:
@@ -10,7 +10,7 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-    name: Build Windows App
+    name: Build Windows App (non-self-contained)
 
     steps:
       - name: Checkout repository
@@ -19,22 +19,22 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # uprav podle potřeby
+          dotnet-version: '8.0.x' # uprav podle své verze
 
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: Publish self-contained app
-        run: dotnet publish TestySZP/TestySZP.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true -o publish
+      - name: Publish framework-dependent build
+        run: dotnet publish TestySZP/TestySZP.csproj --configuration Release --output publish
 
       - name: Set ZIP filename
         id: zipname
         run: echo "ZIP_NAME=TestySZP-${{ github.event.release.tag_name }}-win-x64.zip" >> $env:GITHUB_ENV
 
       - name: Create ZIP archive
-        run: Compress-Archive -Path publish\* -DestinationPath ${{ env.ZIP_NAME }}
+        run: Compress-Archive -Path publish\* -DestinationPath $env:ZIP_NAME
 
-      - name: Upload to GitHub Release
+      - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ env.ZIP_NAME }}
