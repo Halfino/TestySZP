@@ -32,6 +32,17 @@ namespace TestySZP.ViewModels
             }
         }
 
+        private string _testHeader = "SZP";
+        public string TestHeader
+        {
+            get => _testHeader;
+            set
+            {
+                _testHeader = value;
+                OnPropertyChanged(nameof(TestHeader));
+            }
+        }
+
         private string _questionCount;
         public string QuestionCount
         {
@@ -93,7 +104,7 @@ namespace TestySZP.ViewModels
             string fullPath = Path.Combine(testsDir, fileName);
 
             // 📤 Generuj PDF
-            PDFGenerator.GenerateTestPDF(SelectedPerson, questions, fullPath);
+            PDFGenerator.GenerateTestPDF(SelectedPerson, questions, fullPath, TestHeader);
         }
 
         private void GenerateForAll()
@@ -116,7 +127,7 @@ namespace TestySZP.ViewModels
                 string fileName = $"Test_{safeName}_{DateTime.Now:dd.MM.yyyy}.pdf";
                 string fullPath = Path.Combine(testsDir, fileName);
 
-                PDFGenerator.GenerateTestPDF(person, questions, fullPath);
+                PDFGenerator.GenerateTestPDF(person, questions, fullPath, TestHeader);
             }
 
             MessageBox.Show("Testy pro všechny osoby byly úspěšně vygenerovány.", "Hotovo", MessageBoxButton.OK, MessageBoxImage.Information);

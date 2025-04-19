@@ -11,7 +11,7 @@ namespace TestySZP.Services
 {
     public static class PDFGenerator
     {
-        public static TestResult GenerateTestPDF(Person person, List<Question> questions, string filePath)
+        public static TestResult GenerateTestPDF(Person person, List<Question> questions, string filePath, string headerText)
         {
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
 
@@ -26,7 +26,7 @@ namespace TestySZP.Services
             Font boldFont = new Font(baseFont, 12, Font.BOLD);
 
             // Úvod
-            document.Add(new Paragraph($"Kontrolní test SZP", titleFont) { Alignment = Element.ALIGN_CENTER });
+            document.Add(new Paragraph($"Kontrolní test " + headerText, titleFont) { Alignment = Element.ALIGN_CENTER });
             document.Add(new Paragraph("\n"));
             document.Add(new Paragraph($"Hodnost, jméno, příjmení: {person.Name}", normalFont));
             document.Add(new Paragraph($"Dosažená třída: {person.KnowledgeClass}", normalFont));
@@ -56,7 +56,8 @@ namespace TestySZP.Services
                 if (!question.IsWritten && question.Answers != null && question.Answers.Count > 0)
                 {
                     char optionLabel = 'A';
-                    foreach (var answer in question.Answers)
+                    var shuffledAnswers = question.Answers.OrderBy(a => Guid.NewGuid()).ToList();
+                    foreach (var answer in shuffledAnswers)
                     {
                         cell.AddElement(new Paragraph($" {optionLabel}) {answer.Text}", normalFont));
                         if (answer.IsCorrect)
