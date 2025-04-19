@@ -92,7 +92,8 @@ namespace TestySZP.ViewModels
             var questions = _testService.GenerateTestForPerson(SelectedPerson, count);
 
             // 📁 Složka Tests/
-            string exeDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            string exeDir = Path.GetDirectoryName(exePath);
             string baseDir = Path.Combine(exeDir, "Tests");
             string monthDir = DateTime.Now.ToString("MM-yyyy");
             string testsDir = Path.Combine(baseDir, monthDir);
@@ -112,8 +113,9 @@ namespace TestySZP.ViewModels
         {
             if (!int.TryParse(QuestionCount, out int count) || People.Count == 0)
                 return;
-
-            string baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Tests");
+            string exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
+            string exeDir = Path.GetDirectoryName(exePath);
+            string baseDir = Path.Combine(exeDir, "Tests");
             string monthDir = DateTime.Now.ToString("MM-yyyy");
             string testsDir = Path.Combine(baseDir, monthDir);
 
